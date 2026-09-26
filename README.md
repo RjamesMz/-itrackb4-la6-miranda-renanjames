@@ -1,13 +1,15 @@
-Self Assesment Questions
+Q1: You added a second filter without adding a single route. Explain why no new route was needed. Your answer should say something about what the router actually looks at.
 
-Q1 Explain the order you placed your featured route and your detail route in, and what would happen if you swapped them.
+A1: The router only matches on the path and the HTTP method, it doesn't look at the query string at all when deciding which route handles the request. So /medicines?type=Tablet and /medicines?type=Tablet&stock=Full both still hit the same medicines.index route since the path never changed. Adding stock as a second filter just meant reading one more value off the request in the controller, routing had already finished its job before that even happens.
 
-A1 The order of my routes are the featured route should always be at the top od the detail route, if the detail route and featured route are swaped the word "feature" would be considered as a real data that will be fed to the {id} parameter because there is no contraint wether the id should be integer or string, so the result will be a 404 page Not found because the controller would scan the data source and find the id "featured" which is not existing.
+Q2: Suppose you had built both filters as route parameters instead. Describe what the URL for 'year 4 only, no course filter' would have to look like, and why.
 
-Q2 What happens when someone visits an id that does not exist in your data, and what did you write to make that happen?
+A2: Route parameters are positions in the path, so the router expects something sitting in every slot unless you specifically mark it optional. For year 4 with no course filter the URL would have to be something like /medicines/4/all, using a placeholder value instead of just leaving the course slot empty. That's the opposite of query strings where you can just not include a parameter you don't need, which is basically why query strings are the better for optional filters.
 
-A2 When someone puts a random number that is non existent in my data source it would be flagged by the controller and sent to a 404 not found page, we wrote a guard clause where if a data does not exits it will run a helper that diplays the 404 not found page or "abort(404)" 
+Q3: Your navigation link stays marked on a detail page and also when a filter is applied. Only one of those two needed a change to your pattern. Say which one, and why the other needed nothing.
 
-Q3 Why do your links use route names instead of typed URLs? Give one concrete thing that would break if they did not.
+A3: The detail page needed no change because request()->is('medicines') is an exact match on the path, so a detail page like /medicines/5 already fails that check on its own since the path is longer. The filter case did need a change because /medicines?type=Tablet has the exact same path as /medicines, so is() can't tell those two apart no matter how the pattern is written. That's why I had to add a separate has() check for the query string, since is() was never going to see it.
 
-A3 Route names are better than hard coded url. Route names makes changing the url pattern easier, rather than changing each hardcoded url you would only need to change the url pattern and the route stil works. Its like remembering the place like "Plaza" instead of memorizing the complete address, so if the address of the place change the "name" is still the same
+Q4: You deleted your old filter method but kept the empty store and update methods, even though none of the three can be reached by a URL. Explain the difference between them.
+
+A4: The old filter method is fully gone now, so a route pointing at it would just error, nothing's left to call. Store and update are still real methods sitting in the controller, just not wired to a route yet. The rule is that keep code that isn't finished yet, delete code that's been replaced, store and update are work still coming later.
